@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1565C0">
+<meta name="description" content="Temporary email inbox with automatic message updates and OTP highlighting.">
+<title>Temp Mail — Live OTP</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #1565C0;
+  --primary-dark: #0D47A1;
+  --background: #F5F9FF;
+  --surface: #FFFFFF;
+  --soft-blue: #E3EDF7;
+  --text: #101820;
+  --muted: #73808C;
+  --border: #DCE6F0;
+  --success: #16803C;
+  --danger: #C62828;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.subtitle {
+  color: #43515F;
+  font-size: 14px;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.email-box,
+.inbox,
+.reader {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+}
+
+.email-display {
+  font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  padding: 14px 16px;
+  background: var(--soft-blue);
+  border-radius: 12px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+button:focus-visible {
+  outline: 3px solid #90CAF9;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#generateBtn {
+  background: var(--primary);
+  color: white;
+}
+
+#generateBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+#copyBtn {
+  background: #D6E8FF;
+  color: var(--primary);
+}
+
+.inbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.inbox-header h2 {
+  font-size: 18px;
+}
+
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.status.error {
+  color: var(--danger);
+}
+
+.status.success {
+  color: var(--success);
+}
+
+.message-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message-list li {
+  border-radius: 10px;
+  background: var(--background);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.message-list li.empty {
+  padding: 13px 14px;
+  color: var(--muted);
+  text-align: center;
+  background: transparent;
+  line-height: 1.5;
+}
+
+.message-list button.message {
+  display: block;
+  width: 100%;
+  padding: 13px 14px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.message-list button.message:hover {
+  background: var(--soft-blue);
+  border-color: var(--border);
+}
+
+.reader.hidden {
+  display: none;
+}
+
+.reader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reader-header h3 {
+  font-size: 16px;
+  color: var(--primary);
+  overflow-wrap: anywhere;
+}
+
+#closeReader {
+  background: var(--soft-blue);
+  color: #43515F;
+  padding: 7px 12px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.reader-meta {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  margin-bottom: 14px;
+}
+
+.reader-body {
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.otp-highlight {
+  display: inline-block;
+  background: #FFF3CD;
+  color: #8B5A00;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+}
+
+.inbox-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.small-text {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#refreshBtn {
+  background: var(--soft-blue);
+  color: var(--primary);
+  padding: 8px 12px;
+}
+
+.warning {
+  background: #FFF8E1;
+  color: #775600;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.6;
+  padding: 8px 0 16px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 18px 12px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .email-box,
+  .inbox,
+  .reader {
+    padding: 16px;
+  }
+
+  .email-display {
+    font-size: 16px;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Temp Mail</h1>
+    <p class="subtitle">
+      Temporary email. Live inbox. Automatic OTP highlighting.
+    </p>
+  </header>
+
+  <div class="warning">
+    Temporary inboxes may be publicly accessible and messages may disappear.
+    Do not use this service for banking, sensitive accounts, or private information.
+  </div>
+
+  <section class="email-box">
+    <div class="email-display" id="emailDisplay" aria-live="polite">
+      Generate an email to get started
+    </div>
+
+    <div class="actions">
+      <button id="generateBtn" type="button">Generate New Email</button>
+      <button id="copyBtn" type="button" disabled>Copy Email</button>
+    </div>
+  </section>
+
+  <section class="inbox">
+    <div class="inbox-header">
+      <h2>Inbox</h2>
+      <span class="status" id="status" role="status" aria-live="polite">Idle</span>
+    </div>
+
+    <ul id="messageList" class="message-list">
+      <li class="empty">Generate an email address to start checking for messages.</li>
+    </ul>
+
+    <div class="inbox-footer">
+      <span class="small-text" id="refreshInfo">Automatic refresh: off</span>
+      <button id="refreshBtn" type="button" disabled>Refresh Now</button>
+    </div>
+  </section>
+
+  <section class="reader hidden" id="reader">
+    <div class="reader-header">
+      <h3 id="readerSubject">Message</h3>
+      <button id="closeReader" type="button">Close</button>
+    </div>
+    <div class="reader-meta" id="readerMeta"></div>
+    <div class="reader-body" id="readerBody"></div>
+  </section>
+
+  <footer>
+    Temp Mail · Messages depend on the availability of the external email service.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+const API = "https://www.1secmail.com/api/v1/";
+const REFRESH_MS = 5000;
+const REQUEST_TIMEOUT_MS = 8000;
+const STORAGE_KEY = "tempmail:address";
+
+let currentLogin = null;
+let currentDomain = null;
+
+let refreshTimer = null;
+let countdownTimer = null;
+
+let isFetching = false;
+let currentGeneration = 0;
+let currentMessageRequest = 0;
+let nextRefreshAt = 0;
+let lastSignature = "";
+
+const emailDisplay = document.getElementById("emailDisplay");
+const generateBtn = document.getElementById("generateBtn");
+const copyBtn = document.getElementById("copyBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+
+const messageList = document.getElementById("messageList");
+const statusEl = document.getElementById("status");
+const refreshInfo = document.getElementById("refreshInfo");
+
+const reader = document.getElementById("reader");
+const readerSubject = document.getElementById("readerSubject");
+const readerMeta = document.getElementById("readerMeta");
+const readerBody = document.getElementById("readerBody");
+const closeReaderBtn = document.getElementById("closeReader");
+
+generateBtn.addEventListener("click", generateEmail);
+copyBtn.addEventListener("click", copyEmail);
+refreshBtn.addEventListener("click", () => fetchMessages());
+closeReaderBtn.addEventListener("click", closeMessage);
+
+/* ---------- Storage (wrapped: can be unavailable or blocked) ---------- */
+
+function saveAddress(login, domain) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ login, domain }));
+  } catch (_) { /* ignore */ }
+}
+
+function loadAddress() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data && typeof data.login === "string" && typeof data.domain === "string") {
+      return data;
+    }
+  } catch (_) { /* ignore */ }
+  return null;
+}
+
+/* ---------- UI helpers ---------- */
+
+function setStatus(message, type = "") {
+  statusEl.textContent = message;
+  statusEl.className = "status";
+
+  if (type) {
+    statusEl.classList.add(type);
+  }
+}
+
+function showEmptyMessage(message) {
+  lastSignature = "";
+  messageList.replaceChildren();
+
+  const li = document.createElement("li");
+  li.className = "empty";
+  li.textContent = message;
+
+  messageList.appendChild(li);
+}
+
+/* ---------- Auto refresh ---------- */
+
+function stopRefresh() {
+  if (refreshTimer !== null) {
+    clearTimeout(refreshTimer);
+    refreshTimer = null;
+  }
+
+  if (countdownTimer !== null) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+
+  refreshInfo.textContent = "Automatic refresh: off";
+}
+
+function startRefresh() {
+  stopRefresh();
+
+  nextRefreshAt = Date.now() + REFRESH_MS;
+
+  countdownTimer = setInterval(() => {
+    if (!currentLogin || !currentDomain) return;
+
+    const remaining = Math.max(
+      0,
+      Math.ceil((nextRefreshAt - Date.now()) / 1000)
+    );
+
+    refreshInfo.textContent = `Next automatic refresh in ${remaining}s`;
+  }, 1000);
+
+  scheduleNextRefresh(currentGeneration);
+}
+
+function scheduleNextRefresh(generation) {
+  if (!currentLogin || !currentDomain) return;
+
+  if (refreshTimer !== null) {
+    clearTimeout(refreshTimer);
+  }
+
+  nextRefreshAt = Date.now() + REFRESH_MS;
+
+  refreshTimer = setTimeout(async () => {
+    refreshTimer = null;
+
+    if (generation !== currentGeneration) return;
+
+    await fetchMessages();
+
+    if (generation === currentGeneration) {
+      scheduleNextRefresh(generation);
+    }
+  }, REFRESH_MS);
+}
+
+/* ---------- API ---------- */
+
+async function apiRequest(params) {
+  const url = new URL(API);
+
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, String(value));
+  }
+
+  // AbortController works in all browsers (AbortSignal.timeout does not).
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server returned HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/* ---------- Address lifecycle ---------- */
+
+function resetForNewAddress() {
+  const generation = ++currentGeneration;
+
+  stopRefresh();
+
+  currentLogin = null;
+  currentDomain = null;
+
+  isFetching = false;
+  currentMessageRequest++;
+  lastSignature = "";
+
+  closeMessage();
+
+  return generation;
+}
+
+function activateAddress(login, domain) {
+  currentLogin = login;
+  currentDomain = domain;
+
+  emailDisplay.textContent = `${login}@${domain}`;
+
+  copyBtn.disabled = false;
+  refreshBtn.disabled = false;
+
+  saveAddress(login, domain);
+}
+
+async function generateEmail() {
+  const generation = resetForNewAddress();
+
+  generateBtn.disabled = true;
+  copyBtn.disabled = true;
+  refreshBtn.disabled = true;
+
+  setStatus("Generating email...");
+  emailDisplay.textContent = "Generating...";
+  showEmptyMessage("Please wait while an email address is generated.");
+
+  try {
+    const data = await apiRequest({
+      action: "genRandomMailbox",
+      count: 1
+    });
+
+    if (generation !== currentGeneration) return;
+
+    if (!Array.isArray(data) || typeof data[0] !== "string") {
+      throw new Error("The email service returned an invalid response.");
+    }
+
+    const email = data[0].trim();
+    const separator = email.lastIndexOf("@");
+
+    if (separator <= 0 || separator === email.length - 1) {
+      throw new Error("The email service returned an invalid address.");
+    }
+
+    activateAddress(email.slice(0, separator), email.slice(separator + 1));
+
+    setStatus("Email ready", "success");
+    showEmptyMessage("No messages yet. Waiting for incoming email...");
+
+    await fetchMessages();
+
+    if (generation === currentGeneration) {
+      startRefresh();
+    }
+
+  } catch (error) {
+    if (generation !== currentGeneration) return;
+
+    console.error("Generate email error:", error);
+
+    emailDisplay.textContent = "Unable to generate email";
+    setStatus("Email generation failed", "error");
+    showEmptyMessage(
+      "Could not generate an email. Check your connection and try again."
+    );
+
+  } finally {
+    if (generation === currentGeneration) {
+      generateBtn.disabled = false;
+    }
+  }
+}
+
+async function restoreAddress() {
+  const saved = loadAddress();
+  if (!saved) return;
+
+  const generation = resetForNewAddress();
+
+  activateAddress(saved.login, saved.domain);
+  setStatus("Restoring inbox...");
+  showEmptyMessage("No messages yet. Waiting for incoming email...");
+
+  await fetchMessages();
+
+  if (generation === currentGeneration) {
+    startRefresh();
+  }
+}
+
+/* ---------- Inbox ---------- */
+
+async function fetchMessages() {
+  if (!currentLogin || !currentDomain || isFetching) {
+    return;
+  }
+
+  isFetching = true;
+
+  const generation = currentGeneration;
+  const login = currentLogin;
+  const domain = currentDomain;
+
+  try {
+    const messages = await apiRequest({
+      action: "getMessages",
+      login,
+      domain
+    });
+
+    if (
+      generation !== currentGeneration ||
+      login !== currentLogin ||
+      domain !== currentDomain
+    ) {
+      return;
+    }
+
+    if (!Array.isArray(messages)) {
+      throw new Error("Invalid inbox response.");
+    }
+
+    renderMessages(messages);
+
+    if (messages.length > 0) {
+      setStatus(
+        `${messages.length} message${messages.length === 1 ? "" : "s"}`,
+        "success"
+      );
+    } else {
+      setStatus("Waiting for messages...");
+    }
+
+  } catch (error) {
+    if (generation !== currentGeneration) return;
+
+    console.error("Inbox error:", error);
+
+    setStatus("Inbox temporarily unavailable", "error");
+  } finally {
+    // Only the current generation may release the lock; a stale request
+    // must not unlock a fetch that belongs to a newer address.
+    if (generation === currentGeneration) {
+      isFetching = false;
+    }
+  }
+}
+
+function renderMessages(messages) {
+  if (messages.length === 0) {
+    if (lastSignature !== "empty") {
+      showEmptyMessage("No messages yet. Waiting for incoming email...");
+      lastSignature = "empty";
+    }
+    return;
+  }
+
+  // Skip the rebuild when nothing changed (keeps focus, avoids flicker).
+  const signature = messages
+    .map(m => `${m.id}|${m.from}|${m.subject}`)
+    .join(",");
+
+  if (signature === lastSignature) return;
+  lastSignature = signature;
+
+  const activeId = document.activeElement?.dataset?.id;
+
+  messageList.replaceChildren();
+
+  messages.forEach(msg => {
+    const li = document.createElement("li");
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "message";
+
+    const sender = msg.from || "Unknown sender";
+    const subject = msg.subject || "(no subject)";
+    btn.textContent = `${sender} — ${subject}`;
+
+    if (msg.id !== undefined && msg.id !== null) {
+      btn.dataset.id = String(msg.id);
+      btn.addEventListener("click", () => openMessage(msg.id));
+    } else {
+      btn.disabled = true;
+    }
+
+    li.appendChild(btn);
+    messageList.appendChild(li);
+
+    if (activeId && btn.dataset.id === activeId) {
+      btn.focus({ preventScroll: true });
+    }
+  });
+}
+
+async function openMessage(id) {
+  if (!currentLogin || !currentDomain) return;
+
+  const requestId = ++currentMessageRequest;
+  const generation = currentGeneration;
+
+  const login = currentLogin;
+  const domain = currentDomain;
+
+  reader.classList.remove("hidden");
+  readerSubject.textContent = "Loading message...";
+  readerMeta.textContent = "";
+  readerBody.textContent = "";
+
+  try {
+    const msg = await apiRequest({
+      action: "readMessage",
+      login,
+      domain,
+      id
+    });
+
+    if (
+      requestId !== currentMessageRequest ||
+      generation !== currentGeneration ||
+      login !== currentLogin ||
+      domain !== currentDomain
+    ) {
+      return;
+    }
+
+    if (!msg || typeof msg !== "object") {
+      throw new Error("Invalid message response.");
+    }
+
+    readerSubject.textContent = msg.subject || "(no subject)";
+
+    readerMeta.textContent =
+      `From: ${msg.from || "Unknown"} | Date: ${msg.date || "Unknown"}`;
+
+    // Prefer plain text; strip markup if only HTML exists.
+    const body = msg.textBody
+      ? String(msg.textBody)
+      : stripHtml(msg.htmlBody || "");
+
+    renderHighlightedBody(body || "(empty)");
+
+    reader.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  } catch (error) {
+    if (requestId !== currentMessageRequest) return;
+
+    console.error("Read message error:", error);
+
+    readerSubject.textContent = "Unable to open message";
+    readerBody.textContent =
+      "The message could not be loaded. Please try again.";
+  }
+}
+
+function stripHtml(html) {
+  const doc = new DOMParser().parseFromString(String(html), "text/html");
+
+  doc.querySelectorAll("script, style, iframe, object, embed").forEach(
+    element => element.remove()
+  );
+
+  return doc.body.textContent || "";
+}
+
+function renderHighlightedBody(body) {
+  readerBody.replaceChildren();
+
+  /*
+    Highlight standalone 4-8 digit codes, or 3+3 codes like "123 456".
+    Digits adjacent to - . / : are skipped so dates, times, and phone
+    numbers are not highlighted. Visual aid only, not proof of an OTP.
+  */
+  const pattern =
+    /(?<![\d\-./:])(?:\d{4,8}|\d{3}[ -]\d{3})(?![\d\-./:])/g;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = pattern.exec(body)) !== null) {
+    readerBody.appendChild(
+      document.createTextNode(body.slice(lastIndex, match.index))
+    );
+
+    const span = document.createElement("span");
+    span.className = "otp-highlight";
+    span.textContent = match[0];
+
+    readerBody.appendChild(span);
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  readerBody.appendChild(document.createTextNode(body.slice(lastIndex)));
+}
+
+function closeMessage() {
+  currentMessageRequest++;
+
+  reader.classList.add("hidden");
+  readerSubject.textContent = "Message";
+  readerMeta.textContent = "";
+  readerBody.textContent = "";
+}
+
+async function copyEmail() {
+  if (!currentLogin || !currentDomain) return;
+
+  const email = `${currentLogin}@${currentDomain}`;
+
+  try {
+    await navigator.clipboard.writeText(email);
+
+    copyBtn.textContent = "Copied!";
+    copyBtn.disabled = true;
+
+    setTimeout(() => {
+      copyBtn.textContent = "Copy Email";
+      copyBtn.disabled = !currentLogin || !currentDomain;
+    }, 1500);
+
+  } catch (error) {
+    console.error("Clipboard error:", error);
+
+    window.prompt("Copy your email address:", email);
+  }
+}
+
+/* ---------- Lifecycle ---------- */
+
+// Pause timers while hidden; refresh immediately on return.
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopRefresh();
+  } else if (currentLogin && currentDomain) {
+    const generation = currentGeneration;
+    fetchMessages().finally(() => {
+      if (generation === currentGeneration) {
+        startRefresh();
+      }
+    });
+  }
+});
+
+window.addEventListener("pagehide", stopRefresh);
+
+restoreAddress();
+</script>
+</body>
+</html>
