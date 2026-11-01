@@ -2,898 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1565C0">
-<meta name="description" content="Temporary email inbox with automatic message updates and OTP highlighting.">
-<title>Temp Mail — Live OTP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Plain Guide to HTML</title>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  --primary: #1565C0;
-  --primary-dark: #0D47A1;
-  --background: #F5F9FF;
-  --surface: #FFFFFF;
-  --soft-blue: #E3EDF7;
-  --text: #101820;
-  --muted: #73808C;
-  --border: #DCE6F0;
-  --success: #16803C;
-  --danger: #C62828;
-}
-
-body {
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  background: var(--background);
-  color: var(--text);
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 24px 16px;
-}
-
-.container {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-header {
-  margin-bottom: 24px;
-}
-
-h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.subtitle {
-  color: #43515F;
-  font-size: 14px;
-  margin-top: 5px;
-  line-height: 1.5;
-}
-
-.email-box,
-.inbox,
-.reader {
-  background: var(--surface);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  margin-bottom: 20px;
-}
-
-.email-display {
-  font-size: 18px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-  padding: 14px 16px;
-  background: var(--soft-blue);
-  border-radius: 12px;
-  color: var(--primary);
-  margin-bottom: 16px;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-button {
-  border: none;
-  border-radius: 10px;
-  padding: 11px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-}
-
-button:focus-visible {
-  outline: 3px solid #90CAF9;
-  outline-offset: 2px;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-#generateBtn {
-  background: var(--primary);
-  color: white;
-}
-
-#generateBtn:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
-
-#copyBtn {
-  background: #D6E8FF;
-  color: var(--primary);
-}
-
-.inbox-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.inbox-header h2 {
-  font-size: 18px;
-}
-
-.status {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: right;
-}
-
-.status.error {
-  color: var(--danger);
-}
-
-.status.success {
-  color: var(--success);
-}
-
-.message-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.message-list li {
-  border-radius: 10px;
-  background: var(--background);
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-
-.message-list li.empty {
-  padding: 13px 14px;
-  color: var(--muted);
-  text-align: center;
-  background: transparent;
-  line-height: 1.5;
-}
-
-.message-list button.message {
-  display: block;
-  width: 100%;
-  padding: 13px 14px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text);
-  background: var(--background);
-  border: 1px solid transparent;
-  border-radius: 10px;
-  overflow-wrap: anywhere;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.message-list button.message:hover {
-  background: var(--soft-blue);
-  border-color: var(--border);
-}
-
-.reader.hidden {
-  display: none;
-}
-
-.reader-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.reader-header h3 {
-  font-size: 16px;
-  color: var(--primary);
-  overflow-wrap: anywhere;
-}
-
-#closeReader {
-  background: var(--soft-blue);
-  color: #43515F;
-  padding: 7px 12px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.reader-meta {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-  margin-bottom: 14px;
-}
-
-.reader-body {
-  font-size: 14px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.otp-highlight {
-  display: inline-block;
-  background: #FFF3CD;
-  color: #8B5A00;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 6px;
-  letter-spacing: 1px;
-}
-
-.inbox-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.small-text {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-#refreshBtn {
-  background: var(--soft-blue);
-  color: var(--primary);
-  padding: 8px 12px;
-}
-
-.warning {
-  background: #FFF8E1;
-  color: #775600;
-  padding: 12px 14px;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-footer {
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
-  line-height: 1.6;
-  padding: 8px 0 16px;
-}
-
-@media (max-width: 480px) {
   body {
-    padding: 18px 12px;
+    margin: 0;
+    background: #faf7f0;
+    color: #222;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.65;
   }
-
-  h1 {
-    font-size: 25px;
+  header {
+    border-bottom: 2px solid #222;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 28px;
+    background: #faf7f0;
+    position: sticky;
+    top: 0;
   }
-
-  .email-box,
-  .inbox,
-  .reader {
-    padding: 16px;
+  header strong { font-size: 1.1rem; letter-spacing: .02em; }
+  header a {
+    color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .85rem;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
   }
-
-  .email-display {
-    font-size: 16px;
+  header a:hover { border-bottom-color: #c2410c; }
+  main { max-width: 720px; margin: 0 auto; padding: 30px 20px 80px; }
+  h1 { font-size: 2.4rem; line-height: 1.15; margin: 30px 0 10px; }
+  h2 {
+    font-size: 1.55rem;
+    margin: 60px 0 10px;
+    padding-top: 14px;
+    border-top: 1px solid #bbb;
   }
-
-  .actions button {
-    flex: 1;
+  h3 { font-size: 1.1rem; margin: 26px 0 4px; }
+  p { margin: 0 0 14px; }
+  .lead { font-size: 1.15rem; color: #444; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background: #ece6d6;
+    padding: 1px 5px;
+    font-size: .9em;
   }
-}
+  pre {
+    background: #1f1d1a;
+    color: #f0ead8;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: .85rem;
+    line-height: 1.5;
+    margin: 12px 0 0;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .result {
+    border: 1px solid #222;
+    padding: 12px 16px;
+    margin: 0 0 20px;
+    background: #fff;
+    font-size: 1rem;
+  }
+  .label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #777;
+    margin: 12px 0 3px;
+  }
+  .note {
+    border-left: 4px solid #c2410c;
+    padding: 4px 0 4px 14px;
+    margin: 20px 0;
+    color: #444;
+  }
+  table.demo { border-collapse: collapse; }
+  table.demo th, table.demo td { border: 1px solid #222; padding: 4px 12px; text-align: left; }
+  #editor { width: 100%; height: 220px; box-sizing: border-box;
+    font-family: Consolas, "Courier New", monospace; font-size: .85rem;
+    padding: 10px; border: 1px solid #222; background: #fff; resize: vertical; }
+  #preview { width: 100%; height: 220px; border: 1px solid #222; background: #fff; margin-top: 10px; }
+  footer { border-top: 2px solid #222; padding: 20px; text-align: center; font-size: .9rem; color: #555; }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>Temp Mail</h1>
-    <p class="subtitle">
-      Temporary email. Live inbox. Automatic OTP highlighting.
-    </p>
-  </header>
 
-  <div class="warning">
-    Temporary inboxes may be publicly accessible and messages may disappear.
-    Do not use this service for banking, sensitive accounts, or private information.
-  </div>
+<header>
+  <strong>A Plain Guide to HTML</strong>
+  <a href="#what">What it is</a>
+  <a href="#structure">Structure</a>
+  <a href="#text">Text</a>
+  <a href="#links">Links &amp; images</a>
+  <a href="#lists">Lists</a>
+  <a href="#forms">Forms</a>
+  <a href="#css">Adding style</a>
+  <a href="#mistakes">Mistakes</a>
+  <a href="#try">Try it</a>
+</header>
 
-  <section class="email-box">
-    <div class="email-display" id="emailDisplay" aria-live="polite">
-      Generate an email to get started
-    </div>
+<main>
 
-    <div class="actions">
-      <button id="generateBtn" type="button">Generate New Email</button>
-      <button id="copyBtn" type="button" disabled>Copy Email</button>
-    </div>
-  </section>
+<h1>How to write a web page with HTML</h1>
+<p class="lead">Every website you have ever opened is built on HTML. This page walks through the parts you need to write your own, with small examples you can copy.</p>
+<p>Presented by: <em>Your Name</em> &middot; <em>Course / Date</em></p>
 
-  <section class="inbox">
-    <div class="inbox-header">
-      <h2>Inbox</h2>
-      <span class="status" id="status" role="status" aria-live="polite">Idle</span>
-    </div>
+<h2 id="what">What HTML is</h2>
+<p>HTML stands for HyperText Markup Language. It is not a programming language. It does not calculate or make decisions. It describes <em>what things are</em> on a page: this is a heading, this is a paragraph, this is a link.</p>
+<p>You write it in a plain text file, save it with the ending <code>.html</code>, and open it in a browser. That is all you need. No install, no special software. Notepad works.</p>
 
-    <ul id="messageList" class="message-list">
-      <li class="empty">Generate an email address to start checking for messages.</li>
-    </ul>
+<div class="note">Three languages build most pages. HTML is the content, CSS is the look, JavaScript is the behavior. This guide covers HTML and a little CSS.</div>
 
-    <div class="inbox-footer">
-      <span class="small-text" id="refreshInfo">Automatic refresh: off</span>
-      <button id="refreshBtn" type="button" disabled>Refresh Now</button>
-    </div>
-  </section>
+<h2 id="structure">The basic structure</h2>
+<p>Most of HTML is made of <strong>tags</strong>. A tag is a word inside angle brackets. Most tags come in pairs: one to open, one to close (with a slash). Together with what is between them, they are called an <strong>element</strong>.</p>
 
-  <section class="reader hidden" id="reader">
-    <div class="reader-header">
-      <h3 id="readerSubject">Message</h3>
-      <button id="closeReader" type="button">Close</button>
-    </div>
-    <div class="reader-meta" id="readerMeta"></div>
-    <div class="reader-body" id="readerBody"></div>
-  </section>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;My First Page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello&lt;/h1&gt;
+    &lt;p&gt;This is my page.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
-  <footer>
-    Temp Mail · Messages depend on the availability of the external email service.
-  </footer>
+<h3>What each part does</h3>
+<p><code>&lt;!DOCTYPE html&gt;</code> tells the browser this is modern HTML. <code>&lt;html&gt;</code> wraps everything. <code>&lt;head&gt;</code> holds information about the page, like the title shown on the browser tab. <code>&lt;body&gt;</code> holds everything people actually see.</p>
+
+<h2 id="text">Headings, paragraphs and emphasis</h2>
+<p>Headings go from <code>&lt;h1&gt;</code> (biggest, most important) down to <code>&lt;h6&gt;</code>. Use one <code>&lt;h1&gt;</code> per page. Paragraphs use <code>&lt;p&gt;</code>.</p>
+
+<pre><code>&lt;h1&gt;Main title&lt;/h1&gt;
+&lt;h2&gt;A section&lt;/h2&gt;
+&lt;p&gt;Some text with &lt;strong&gt;bold&lt;/strong&gt; and &lt;em&gt;italic&lt;/em&gt; words.&lt;/p&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result">
+  <h3 style="margin-top:0;font-size:1.5rem">Main title</h3>
+  <h4 style="margin:6px 0">A section</h4>
+  <p style="margin:0">Some text with <strong>bold</strong> and <em>italic</em> words.</p>
 </div>
 
+<p>One thing that surprises beginners: the browser ignores extra spaces and line breaks in your file. If you want a line break inside a paragraph, use <code>&lt;br&gt;</code>. If you want a new paragraph, use another <code>&lt;p&gt;</code>.</p>
+
+<h2 id="links">Links and images</h2>
+<p>Both use <strong>attributes</strong>, extra information placed inside the opening tag as <code>name="value"</code>.</p>
+
+<pre><code>&lt;a href="https://www.wikipedia.org"&gt;Go to Wikipedia&lt;/a&gt;
+
+&lt;img src="photo.jpg" alt="A group of students in a lab"&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result"><a href="https://www.wikipedia.org">Go to Wikipedia</a></div>
+
+<p><code>href</code> is where the link goes. <code>src</code> is the image file. The <code>alt</code> text is read aloud by screen readers and shown if the image fails to load, so always write something useful there. The image file must sit in the same folder as your HTML file, or you must give the correct path.</p>
+
+<h2 id="lists">Lists and tables</h2>
+<pre><code>&lt;ul&gt;
+  &lt;li&gt;Rice&lt;/li&gt;
+  &lt;li&gt;Beans&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Open Notepad&lt;/li&gt;
+  &lt;li&gt;Type your code&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result">
+  <ul style="margin:0 0 8px"><li>Rice</li><li>Beans</li></ul>
+  <ol style="margin:0"><li>Open Notepad</li><li>Type your code</li></ol>
+</div>
+<p><code>&lt;ul&gt;</code> is a bulleted list, <code>&lt;ol&gt;</code> is numbered. Each item is an <code>&lt;li&gt;</code>.</p>
+
+<p>Tables are built row by row:</p>
+<pre><code>&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Tag&lt;/th&gt;&lt;th&gt;Meaning&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;p&lt;/td&gt;&lt;td&gt;paragraph&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;a&lt;/td&gt;&lt;td&gt;link&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result">
+  <table class="demo">
+    <tr><th>Tag</th><th>Meaning</th></tr>
+    <tr><td>p</td><td>paragraph</td></tr>
+    <tr><td>a</td><td>link</td></tr>
+  </table>
+</div>
+<p><code>&lt;tr&gt;</code> is a row, <code>&lt;th&gt;</code> a header cell, <code>&lt;td&gt;</code> a normal cell. Use tables for data, not for page layout.</p>
+
+<h2 id="forms">Forms</h2>
+<p>Forms collect input from the user. The pieces are <code>&lt;input&gt;</code> fields, each with a <code>&lt;label&gt;</code>.</p>
+<pre><code>&lt;form&gt;
+  &lt;label for="name"&gt;Your name&lt;/label&gt;
+  &lt;input type="text" id="name"&gt;
+
+  &lt;label for="grade"&gt;Grade&lt;/label&gt;
+  &lt;select id="grade"&gt;
+    &lt;option&gt;A&lt;/option&gt;
+    &lt;option&gt;B&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result">
+  <form onsubmit="return false">
+    <label for="n1">Your name</label>
+    <input type="text" id="n1">
+    <label for="g1" style="margin-left:10px">Grade</label>
+    <select id="g1"><option>A</option><option>B</option></select>
+    <button type="submit">Send</button>
+  </form>
+</div>
+<p>On its own, a form does not send the data anywhere useful. For that you need a server or a form service, which is beyond plain HTML.</p>
+
+<h2 id="css">Adding style with CSS</h2>
+<p>Plain HTML looks plain. CSS changes colors, fonts and spacing. The simplest way is a <code>&lt;style&gt;</code> block in the <code>&lt;head&gt;</code>.</p>
+<pre><code>&lt;head&gt;
+  &lt;style&gt;
+    body { font-family: Arial; background: #f4f4f4; }
+    h1   { color: darkred; }
+    .box { border: 2px solid black; padding: 10px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Styled title&lt;/h1&gt;
+  &lt;p class="box"&gt;A paragraph with a border.&lt;/p&gt;
+&lt;/body&gt;</code></pre>
+<div class="label">What the browser shows</div>
+<div class="result" style="background:#f4f4f4;font-family:Arial">
+  <div style="color:darkred;font-size:1.6rem;font-weight:bold;margin-bottom:8px">Styled title</div>
+  <div style="border:2px solid black;padding:10px">A paragraph with a border.</div>
+</div>
+<p>The part before the braces says <em>what</em> to style. A name with a dot, like <code>.box</code>, targets any element that has <code>class="box"</code>.</p>
+
+<h2 id="mistakes">Mistakes everyone makes</h2>
+<h3>Forgetting to close a tag</h3>
+<p>If you open a <code>&lt;p&gt;</code> and never close it, the browser guesses, and the page can look wrong in odd ways.</p>
+<h3>Wrong file path for an image</h3>
+<p>If the picture does not show, check the file name, the capital letters, and the folder. <code>Photo.JPG</code> and <code>photo.jpg</code> are different files on many systems.</p>
+<h3>Saving as .txt</h3>
+<p>If your file is named <code>index.html.txt</code>, the browser shows your code as text instead of a page. Turn on file extensions to check.</p>
+<h3>Quotes</h3>
+<p>Use straight quotes <code>"</code> in attributes. Curly quotes copied from a word processor will break them.</p>
+
+<h2 id="try">Try it yourself</h2>
+<p>Edit the code below. The result updates as you type.</p>
+<textarea id="editor" spellcheck="false">&lt;h1&gt;My page&lt;/h1&gt;
+&lt;p&gt;Change this text and watch it update.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;First thing&lt;/li&gt;
+  &lt;li&gt;Second thing&lt;/li&gt;
+&lt;/ul&gt;
+&lt;a href="https://www.wikipedia.org"&gt;A link&lt;/a&gt;</textarea>
+<iframe id="preview" title="Live preview"></iframe>
+
+<h2>Where to go next</h2>
+<p>Build one small real page: a page about yourself, a hobby, or a school club. Look up any tag you are unsure about on MDN Web Docs (developer.mozilla.org), which is the standard reference. Then learn more CSS, and later JavaScript.</p>
+
+</main>
+
+<footer>Thank you. Questions?</footer>
+
 <script>
-"use strict";
-
-const API = "https://www.1secmail.com/api/v1/";
-const REFRESH_MS = 5000;
-const REQUEST_TIMEOUT_MS = 8000;
-const STORAGE_KEY = "tempmail:address";
-
-let currentLogin = null;
-let currentDomain = null;
-
-let refreshTimer = null;
-let countdownTimer = null;
-
-let isFetching = false;
-let currentGeneration = 0;
-let currentMessageRequest = 0;
-let nextRefreshAt = 0;
-let lastSignature = "";
-
-const emailDisplay = document.getElementById("emailDisplay");
-const generateBtn = document.getElementById("generateBtn");
-const copyBtn = document.getElementById("copyBtn");
-const refreshBtn = document.getElementById("refreshBtn");
-
-const messageList = document.getElementById("messageList");
-const statusEl = document.getElementById("status");
-const refreshInfo = document.getElementById("refreshInfo");
-
-const reader = document.getElementById("reader");
-const readerSubject = document.getElementById("readerSubject");
-const readerMeta = document.getElementById("readerMeta");
-const readerBody = document.getElementById("readerBody");
-const closeReaderBtn = document.getElementById("closeReader");
-
-generateBtn.addEventListener("click", generateEmail);
-copyBtn.addEventListener("click", copyEmail);
-refreshBtn.addEventListener("click", () => fetchMessages());
-closeReaderBtn.addEventListener("click", closeMessage);
-
-/* ---------- Storage (wrapped: can be unavailable or blocked) ---------- */
-
-function saveAddress(login, domain) {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ login, domain }));
-  } catch (_) { /* ignore */ }
-}
-
-function loadAddress() {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (data && typeof data.login === "string" && typeof data.domain === "string") {
-      return data;
-    }
-  } catch (_) { /* ignore */ }
-  return null;
-}
-
-/* ---------- UI helpers ---------- */
-
-function setStatus(message, type = "") {
-  statusEl.textContent = message;
-  statusEl.className = "status";
-
-  if (type) {
-    statusEl.classList.add(type);
-  }
-}
-
-function showEmptyMessage(message) {
-  lastSignature = "";
-  messageList.replaceChildren();
-
-  const li = document.createElement("li");
-  li.className = "empty";
-  li.textContent = message;
-
-  messageList.appendChild(li);
-}
-
-/* ---------- Auto refresh ---------- */
-
-function stopRefresh() {
-  if (refreshTimer !== null) {
-    clearTimeout(refreshTimer);
-    refreshTimer = null;
-  }
-
-  if (countdownTimer !== null) {
-    clearInterval(countdownTimer);
-    countdownTimer = null;
-  }
-
-  refreshInfo.textContent = "Automatic refresh: off";
-}
-
-function startRefresh() {
-  stopRefresh();
-
-  nextRefreshAt = Date.now() + REFRESH_MS;
-
-  countdownTimer = setInterval(() => {
-    if (!currentLogin || !currentDomain) return;
-
-    const remaining = Math.max(
-      0,
-      Math.ceil((nextRefreshAt - Date.now()) / 1000)
-    );
-
-    refreshInfo.textContent = `Next automatic refresh in ${remaining}s`;
-  }, 1000);
-
-  scheduleNextRefresh(currentGeneration);
-}
-
-function scheduleNextRefresh(generation) {
-  if (!currentLogin || !currentDomain) return;
-
-  if (refreshTimer !== null) {
-    clearTimeout(refreshTimer);
-  }
-
-  nextRefreshAt = Date.now() + REFRESH_MS;
-
-  refreshTimer = setTimeout(async () => {
-    refreshTimer = null;
-
-    if (generation !== currentGeneration) return;
-
-    await fetchMessages();
-
-    if (generation === currentGeneration) {
-      scheduleNextRefresh(generation);
-    }
-  }, REFRESH_MS);
-}
-
-/* ---------- API ---------- */
-
-async function apiRequest(params) {
-  const url = new URL(API);
-
-  for (const [key, value] of Object.entries(params)) {
-    url.searchParams.set(key, String(value));
-  }
-
-  // AbortController works in all browsers (AbortSignal.timeout does not).
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: { "Accept": "application/json" },
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error(`Server returned HTTP ${response.status}`);
-    }
-
-    return await response.json();
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-/* ---------- Address lifecycle ---------- */
-
-function resetForNewAddress() {
-  const generation = ++currentGeneration;
-
-  stopRefresh();
-
-  currentLogin = null;
-  currentDomain = null;
-
-  isFetching = false;
-  currentMessageRequest++;
-  lastSignature = "";
-
-  closeMessage();
-
-  return generation;
-}
-
-function activateAddress(login, domain) {
-  currentLogin = login;
-  currentDomain = domain;
-
-  emailDisplay.textContent = `${login}@${domain}`;
-
-  copyBtn.disabled = false;
-  refreshBtn.disabled = false;
-
-  saveAddress(login, domain);
-}
-
-async function generateEmail() {
-  const generation = resetForNewAddress();
-
-  generateBtn.disabled = true;
-  copyBtn.disabled = true;
-  refreshBtn.disabled = true;
-
-  setStatus("Generating email...");
-  emailDisplay.textContent = "Generating...";
-  showEmptyMessage("Please wait while an email address is generated.");
-
-  try {
-    const data = await apiRequest({
-      action: "genRandomMailbox",
-      count: 1
-    });
-
-    if (generation !== currentGeneration) return;
-
-    if (!Array.isArray(data) || typeof data[0] !== "string") {
-      throw new Error("The email service returned an invalid response.");
-    }
-
-    const email = data[0].trim();
-    const separator = email.lastIndexOf("@");
-
-    if (separator <= 0 || separator === email.length - 1) {
-      throw new Error("The email service returned an invalid address.");
-    }
-
-    activateAddress(email.slice(0, separator), email.slice(separator + 1));
-
-    setStatus("Email ready", "success");
-    showEmptyMessage("No messages yet. Waiting for incoming email...");
-
-    await fetchMessages();
-
-    if (generation === currentGeneration) {
-      startRefresh();
-    }
-
-  } catch (error) {
-    if (generation !== currentGeneration) return;
-
-    console.error("Generate email error:", error);
-
-    emailDisplay.textContent = "Unable to generate email";
-    setStatus("Email generation failed", "error");
-    showEmptyMessage(
-      "Could not generate an email. Check your connection and try again."
-    );
-
-  } finally {
-    if (generation === currentGeneration) {
-      generateBtn.disabled = false;
-    }
-  }
-}
-
-async function restoreAddress() {
-  const saved = loadAddress();
-  if (!saved) return;
-
-  const generation = resetForNewAddress();
-
-  activateAddress(saved.login, saved.domain);
-  setStatus("Restoring inbox...");
-  showEmptyMessage("No messages yet. Waiting for incoming email...");
-
-  await fetchMessages();
-
-  if (generation === currentGeneration) {
-    startRefresh();
-  }
-}
-
-/* ---------- Inbox ---------- */
-
-async function fetchMessages() {
-  if (!currentLogin || !currentDomain || isFetching) {
-    return;
-  }
-
-  isFetching = true;
-
-  const generation = currentGeneration;
-  const login = currentLogin;
-  const domain = currentDomain;
-
-  try {
-    const messages = await apiRequest({
-      action: "getMessages",
-      login,
-      domain
-    });
-
-    if (
-      generation !== currentGeneration ||
-      login !== currentLogin ||
-      domain !== currentDomain
-    ) {
-      return;
-    }
-
-    if (!Array.isArray(messages)) {
-      throw new Error("Invalid inbox response.");
-    }
-
-    renderMessages(messages);
-
-    if (messages.length > 0) {
-      setStatus(
-        `${messages.length} message${messages.length === 1 ? "" : "s"}`,
-        "success"
-      );
-    } else {
-      setStatus("Waiting for messages...");
-    }
-
-  } catch (error) {
-    if (generation !== currentGeneration) return;
-
-    console.error("Inbox error:", error);
-
-    setStatus("Inbox temporarily unavailable", "error");
-  } finally {
-    // Only the current generation may release the lock; a stale request
-    // must not unlock a fetch that belongs to a newer address.
-    if (generation === currentGeneration) {
-      isFetching = false;
-    }
-  }
-}
-
-function renderMessages(messages) {
-  if (messages.length === 0) {
-    if (lastSignature !== "empty") {
-      showEmptyMessage("No messages yet. Waiting for incoming email...");
-      lastSignature = "empty";
-    }
-    return;
-  }
-
-  // Skip the rebuild when nothing changed (keeps focus, avoids flicker).
-  const signature = messages
-    .map(m => `${m.id}|${m.from}|${m.subject}`)
-    .join(",");
-
-  if (signature === lastSignature) return;
-  lastSignature = signature;
-
-  const activeId = document.activeElement?.dataset?.id;
-
-  messageList.replaceChildren();
-
-  messages.forEach(msg => {
-    const li = document.createElement("li");
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "message";
-
-    const sender = msg.from || "Unknown sender";
-    const subject = msg.subject || "(no subject)";
-    btn.textContent = `${sender} — ${subject}`;
-
-    if (msg.id !== undefined && msg.id !== null) {
-      btn.dataset.id = String(msg.id);
-      btn.addEventListener("click", () => openMessage(msg.id));
-    } else {
-      btn.disabled = true;
-    }
-
-    li.appendChild(btn);
-    messageList.appendChild(li);
-
-    if (activeId && btn.dataset.id === activeId) {
-      btn.focus({ preventScroll: true });
-    }
-  });
-}
-
-async function openMessage(id) {
-  if (!currentLogin || !currentDomain) return;
-
-  const requestId = ++currentMessageRequest;
-  const generation = currentGeneration;
-
-  const login = currentLogin;
-  const domain = currentDomain;
-
-  reader.classList.remove("hidden");
-  readerSubject.textContent = "Loading message...";
-  readerMeta.textContent = "";
-  readerBody.textContent = "";
-
-  try {
-    const msg = await apiRequest({
-      action: "readMessage",
-      login,
-      domain,
-      id
-    });
-
-    if (
-      requestId !== currentMessageRequest ||
-      generation !== currentGeneration ||
-      login !== currentLogin ||
-      domain !== currentDomain
-    ) {
-      return;
-    }
-
-    if (!msg || typeof msg !== "object") {
-      throw new Error("Invalid message response.");
-    }
-
-    readerSubject.textContent = msg.subject || "(no subject)";
-
-    readerMeta.textContent =
-      `From: ${msg.from || "Unknown"} | Date: ${msg.date || "Unknown"}`;
-
-    // Prefer plain text; strip markup if only HTML exists.
-    const body = msg.textBody
-      ? String(msg.textBody)
-      : stripHtml(msg.htmlBody || "");
-
-    renderHighlightedBody(body || "(empty)");
-
-    reader.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  } catch (error) {
-    if (requestId !== currentMessageRequest) return;
-
-    console.error("Read message error:", error);
-
-    readerSubject.textContent = "Unable to open message";
-    readerBody.textContent =
-      "The message could not be loaded. Please try again.";
-  }
-}
-
-function stripHtml(html) {
-  const doc = new DOMParser().parseFromString(String(html), "text/html");
-
-  doc.querySelectorAll("script, style, iframe, object, embed").forEach(
-    element => element.remove()
-  );
-
-  return doc.body.textContent || "";
-}
-
-function renderHighlightedBody(body) {
-  readerBody.replaceChildren();
-
-  /*
-    Highlight standalone 4-8 digit codes, or 3+3 codes like "123 456".
-    Digits adjacent to - . / : are skipped so dates, times, and phone
-    numbers are not highlighted. Visual aid only, not proof of an OTP.
-  */
-  const pattern =
-    /(?<![\d\-./:])(?:\d{4,8}|\d{3}[ -]\d{3})(?![\d\-./:])/g;
-
-  let lastIndex = 0;
-  let match;
-
-  while ((match = pattern.exec(body)) !== null) {
-    readerBody.appendChild(
-      document.createTextNode(body.slice(lastIndex, match.index))
-    );
-
-    const span = document.createElement("span");
-    span.className = "otp-highlight";
-    span.textContent = match[0];
-
-    readerBody.appendChild(span);
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  readerBody.appendChild(document.createTextNode(body.slice(lastIndex)));
-}
-
-function closeMessage() {
-  currentMessageRequest++;
-
-  reader.classList.add("hidden");
-  readerSubject.textContent = "Message";
-  readerMeta.textContent = "";
-  readerBody.textContent = "";
-}
-
-async function copyEmail() {
-  if (!currentLogin || !currentDomain) return;
-
-  const email = `${currentLogin}@${currentDomain}`;
-
-  try {
-    await navigator.clipboard.writeText(email);
-
-    copyBtn.textContent = "Copied!";
-    copyBtn.disabled = true;
-
-    setTimeout(() => {
-      copyBtn.textContent = "Copy Email";
-      copyBtn.disabled = !currentLogin || !currentDomain;
-    }, 1500);
-
-  } catch (error) {
-    console.error("Clipboard error:", error);
-
-    window.prompt("Copy your email address:", email);
-  }
-}
-
-/* ---------- Lifecycle ---------- */
-
-// Pause timers while hidden; refresh immediately on return.
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    stopRefresh();
-  } else if (currentLogin && currentDomain) {
-    const generation = currentGeneration;
-    fetchMessages().finally(() => {
-      if (generation === currentGeneration) {
-        startRefresh();
-      }
-    });
-  }
-});
-
-window.addEventListener("pagehide", stopRefresh);
-
-restoreAddress();
+  var ed = document.getElementById('editor');
+  var pv = document.getElementById('preview');
+  // The textarea holds escaped text; decode it once so the user sees real tags.
+  var tmp = document.createElement('textarea');
+  tmp.innerHTML = ed.value;
+  ed.value = tmp.value;
+  function update() { pv.srcdoc = ed.value; }
+  ed.addEventListener('input', update);
+  update();
 </script>
 </body>
 </html>
